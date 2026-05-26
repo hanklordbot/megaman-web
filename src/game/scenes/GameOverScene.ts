@@ -4,19 +4,22 @@ import { InputSystem } from '../systems/InputSystem';
 import { GameState } from '../GameState';
 import { GAME_WIDTH, GAME_HEIGHT } from '../../utils/constants';
 import { StageSelectScene } from './StageSelectScene';
+import { GameplayScene } from './GameplayScene';
 
 export class GameOverScene implements Scene {
   container = new Container();
   private sceneManager: SceneManager;
   private input: InputSystem;
   private gameState: GameState;
+  private stageId: string;
   private cursor = 0;
   private options: Text[] = [];
 
-  constructor(sceneManager: SceneManager, input: InputSystem, gameState: GameState) {
+  constructor(sceneManager: SceneManager, input: InputSystem, gameState: GameState, stageId: string) {
     this.sceneManager = sceneManager;
     this.input = input;
     this.gameState = gameState;
+    this.stageId = stageId;
 
     const title = new Text('GAME OVER', { fontFamily: 'monospace', fontSize: 20, fill: 0xff4444 });
     title.anchor.set(0.5);
@@ -42,7 +45,11 @@ export class GameOverScene implements Scene {
     if (this.input.justPressed('Enter') || this.input.justPressed('KeyZ')) {
       this.gameState.lives = 3;
       this.gameState.reset();
-      this.sceneManager.replace(new StageSelectScene(this.sceneManager, this.input, this.gameState));
+      if (this.cursor === 0) {
+        this.sceneManager.replace(new GameplayScene(this.sceneManager, this.input, this.gameState, this.stageId));
+      } else {
+        this.sceneManager.replace(new StageSelectScene(this.sceneManager, this.input, this.gameState));
+      }
     }
   }
 }

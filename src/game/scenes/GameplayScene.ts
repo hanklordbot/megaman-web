@@ -5,9 +5,9 @@ import { PhysicsSystem } from '../systems/PhysicsSystem';
 import { Camera } from '../systems/Camera';
 import { Player } from '../entities/Player';
 import { BulletSystem } from '../entities/BulletSystem';
-import { Enemy, createEnemy, Met, SniperJoe } from '../entities/Enemy';
+import { Enemy, createEnemy } from '../entities/Enemy';
 import { Boss, createBoss } from '../entities/Boss';
-import { ItemSystem, ItemType } from '../entities/ItemSystem';
+import { ItemSystem } from '../entities/ItemSystem';
 import { HUD } from '../ui/HUD';
 import { GameState, WeaponType } from '../GameState';
 import { LevelData, generateTestLevel } from '../levels/LevelLoader';
@@ -34,6 +34,7 @@ export class GameplayScene implements Scene {
   private enemyBulletContainer = new Container();
   private bossActive = false;
   private deathTimer = 0;
+  private bossDefeatedTimer = 0;
   private stageId: string;
 
   constructor(sceneManager: SceneManager, input: InputSystem, gameState: GameState, stageId: string) {
@@ -91,6 +92,12 @@ export class GameplayScene implements Scene {
   };
 
   update(dt: number) {
+    if (this.bossDefeatedTimer > 0) {
+      this.bossDefeatedTimer -= dt;
+      if (this.bossDefeatedTimer <= 0) this.onBossDefeated();
+      return;
+    }
+
     if (this.player.dead) {
       this.deathTimer += dt;
       if (this.deathTimer > 2) this.handleDeath();
@@ -165,6 +172,7 @@ export class GameplayScene implements Scene {
     if (!this.level.bossId) return;
     this.bossActive = true;
     this.boss = createBoss(this.level.bossId, this.level.bossX!, this.level.bossY!);
+    this.boss.setFloorY(this.level.bossY!);
     this.camera.container.addChild(this.boss.container);
     this.hud.showBossHp(true);
   }
@@ -185,7 +193,7 @@ export class GameplayScene implements Scene {
       for (const e of this.enemies) {
         if (!e.alive) continue;
         // Check invincibility
-        if ((e as any).isInvincible) continue;
+        if (e.isInvincible) continue;
         if (PhysicsSystem.aabbOverlap(b.aabb, e.aabb)) {
           e.hp -= b.damage;
           if (!b.piercing) b.alive = false;
@@ -213,10 +221,8 @@ export class GameplayScene implements Scene {
           this.boss.container.visible = false;
           this.gameState.score += 1000;
           this.gameState.defeatedBosses.add(this.stageId);
-          // Award weapon
           this.awardWeapon();
-          // Transition after delay
-          setTimeout(() => this.onBossDefeated(), 2000);
+          this.bossDefeatedTimer = 2;
         }
       }
     }
@@ -260,7 +266,7 @@ export class GameplayScene implements Scene {
         item.alive = false;
         const effect = ItemSystem.getEffect(item.type);
         if (effect.hp) this.gameState.hp = Math.min(this.gameState.hp + effect.hp, this.gameState.maxHp);
-        if (effect.ammo) this.gameState.restoreAmmo(this.gameState.currentWeapon, effect.ammo);
+        if (effect.ammo) this.gameState.restoreAmmo(effect.ammo);
         if (effect.lives) this.gameState.lives += effect.lives;
         if (effect.score) this.gameState.score += effect.score;
       }
@@ -296,7 +302,7 @@ export class GameplayScene implements Scene {
   private handleDeath() {
     this.gameState.lives--;
     if (this.gameState.lives <= 0) {
-      this.sceneManager.replace(new GameOverScene(this.sceneManager, this.input, this.gameState));
+      this.sceneManager.replace(new GameOverScene(this.sceneManager, this.input, this.gameState, this.stageId));
     } else {
       this.gameState.reset();
       this.sceneManager.replace(new GameplayScene(this.sceneManager, this.input, this.gameState, this.stageId));

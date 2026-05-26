@@ -24,13 +24,28 @@ export class PhysicsSystem {
   update(body: PhysicsBody, dt: number, tileSolid: (col: number, row: number) => boolean) {
     body.vy += this.gravity * dt;
 
-    // Horizontal
-    body.aabb.x += body.vx * dt;
-    this.resolveX(body, tileSolid);
+    // Clamp displacement to TILE_SIZE to prevent tunneling
+    const maxStep = TILE_SIZE;
+    let dx = body.vx * dt;
+    let dy = body.vy * dt;
 
-    // Vertical
-    body.aabb.y += body.vy * dt;
-    this.resolveY(body, tileSolid);
+    // Horizontal (step in increments)
+    const stepsX = Math.ceil(Math.abs(dx) / maxStep);
+    const stepDx = dx / stepsX;
+    for (let i = 0; i < stepsX; i++) {
+      body.aabb.x += stepDx;
+      this.resolveX(body, tileSolid);
+      if (body.vx === 0) break;
+    }
+
+    // Vertical (step in increments)
+    const stepsY = Math.ceil(Math.abs(dy) / maxStep);
+    const stepDy = dy / stepsY;
+    for (let i = 0; i < stepsY; i++) {
+      body.aabb.y += stepDy;
+      this.resolveY(body, tileSolid);
+      if (body.vy === 0) break;
+    }
   }
 
   private resolveX(body: PhysicsBody, solid: (col: number, row: number) => boolean) {

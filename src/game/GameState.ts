@@ -40,11 +40,17 @@ export class GameState {
   lives = 3;
   score = 0;
   currentWeapon = WeaponType.MegaBuster;
+  lastSpecialWeapon = WeaponType.RollingCutter;
   weapons: Map<WeaponType, number> = new Map([[WeaponType.MegaBuster, Infinity]]);
   defeatedBosses: Set<string> = new Set();
 
   addWeapon(type: WeaponType) {
     this.weapons.set(type, WEAPON_DEFS[type].maxAmmo);
+  }
+
+  switchWeapon(type: WeaponType) {
+    if (type !== WeaponType.MegaBuster) this.lastSpecialWeapon = type;
+    this.currentWeapon = type;
   }
 
   useAmmo(type: WeaponType): boolean {
@@ -59,11 +65,13 @@ export class GameState {
     return this.weapons.get(type) ?? 0;
   }
 
-  restoreAmmo(type: WeaponType, amount: number) {
-    if (type === WeaponType.MegaBuster) return;
-    const max = WEAPON_DEFS[type].maxAmmo;
-    const cur = this.weapons.get(type) ?? 0;
-    this.weapons.set(type, Math.min(cur + amount, max));
+  restoreAmmo(amount: number) {
+    // When using MegaBuster, restore last special weapon
+    const target = this.currentWeapon === WeaponType.MegaBuster ? this.lastSpecialWeapon : this.currentWeapon;
+    if (target === WeaponType.MegaBuster) return;
+    const max = WEAPON_DEFS[target].maxAmmo;
+    const cur = this.weapons.get(target) ?? 0;
+    this.weapons.set(target, Math.min(cur + amount, max));
   }
 
   getDamage(weaponType: WeaponType, bossId?: string): number {

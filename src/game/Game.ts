@@ -34,8 +34,8 @@ export class Game {
 
     while (this.accumulator >= FIXED_DT) {
       this.sceneManager.update(FIXED_DT);
-      this.input.endFrame();
       this.accumulator -= FIXED_DT;
     }
+    this.input.endFrame();
   }
 }

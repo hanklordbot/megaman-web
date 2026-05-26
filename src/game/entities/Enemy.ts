@@ -8,6 +8,7 @@ export interface Enemy {
   damage: number;
   container: Container;
   alive: boolean;
+  isInvincible?: boolean;
   update(dt: number, playerX: number, playerY: number): void;
   getBullets?(): { x: number; y: number; vx: number; vy: number; damage: number }[];
 }
@@ -19,6 +20,7 @@ export class Met implements Enemy {
   damage = 2;
   container = new Container();
   alive = true;
+  isInvincible = true;
   private hiding = true;
   private timer = 2;
   private shootCooldown = 0;
@@ -39,13 +41,12 @@ export class Met implements Enemy {
     this.sprite.endFill();
   }
 
-  get isInvincible() { return this.hiding; }
-
   update(dt: number, playerX: number) {
     this.pendingBullets = [];
     this.timer -= dt;
     if (this.hiding && this.timer <= 0) {
       this.hiding = false;
+      this.isInvincible = false;
       this.timer = 1.5;
       this.shootCooldown = 0.3;
       this.draw();
@@ -58,6 +59,7 @@ export class Met implements Enemy {
       }
       if (this.timer <= 0) {
         this.hiding = true;
+        this.isInvincible = true;
         this.timer = 2;
         this.draw();
       }
@@ -76,6 +78,7 @@ export class SniperJoe implements Enemy {
   damage = 2;
   container = new Container();
   alive = true;
+  isInvincible = true;
   private shielded = true;
   private timer = 2;
   private pendingBullets: { x: number; y: number; vx: number; vy: number; damage: number }[] = [];
@@ -100,19 +103,19 @@ export class SniperJoe implements Enemy {
     }
   }
 
-  get isInvincible() { return this.shielded; }
-
   update(dt: number, playerX: number) {
     this.pendingBullets = [];
     this.timer -= dt;
     if (this.shielded && this.timer <= 0) {
       this.shielded = false;
+      this.isInvincible = false;
       this.timer = 1.2;
       this.draw();
     } else if (!this.shielded && this.timer <= 0) {
       const dir = playerX > this.aabb.x ? 1 : -1;
       this.pendingBullets.push({ x: this.aabb.x + 12, y: this.aabb.y + 10, vx: dir * TILE_SIZE * 3, vy: 0, damage: this.damage });
       this.shielded = true;
+      this.isInvincible = true;
       this.timer = 2;
       this.draw();
     }
@@ -168,9 +171,11 @@ export class Flea implements Enemy {
   private vx: number;
   private onGround = true;
   private jumpTimer = 0.5;
+  floorY: number;
 
   constructor(x: number, y: number) {
     this.aabb = { x, y, w: 16, h: 16 };
+    this.floorY = y;
     this.vx = (Math.random() > 0.5 ? 1 : -1) * TILE_SIZE;
     const s = new Graphics();
     s.beginFill(0x44cc44);
@@ -192,8 +197,8 @@ export class Flea implements Enemy {
       this.vy += 9.8 * TILE_SIZE * dt;
       this.aabb.x += this.vx * dt;
       this.aabb.y += this.vy * dt;
-      if (this.aabb.y > 224) { // simple ground check
-        this.aabb.y = 224;
+      if (this.aabb.y > this.floorY) {
+        this.aabb.y = this.floorY;
         this.vy = 0;
         this.onGround = true;
       }

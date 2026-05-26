@@ -74,10 +74,19 @@ export class ItemSystem {
       item.sprite.y = Math.round(item.aabb.y);
       item.sprite.visible = item.alive;
     }
-    this.items = this.items.filter(i => {
-      if (!i.alive) { this.container.removeChild(i.sprite); i.sprite.destroy(); }
-      return i.alive;
-    });
+    // Swap-remove dead items
+    let i = 0;
+    while (i < this.items.length) {
+      if (!this.items[i].alive) {
+        const it = this.items[i];
+        this.container.removeChild(it.sprite);
+        it.sprite.destroy();
+        this.items[i] = this.items[this.items.length - 1];
+        this.items.pop();
+      } else {
+        i++;
+      }
+    }
   }
 
   clear() {

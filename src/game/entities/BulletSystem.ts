@@ -20,6 +20,7 @@ export interface Bullet {
 export class BulletSystem {
   bullets: Bullet[] = [];
   container = new Container();
+  private pool: Bullet[] = [];
   private maxBuster = 3;
 
   get activeBusterCount(): number {
@@ -71,15 +72,26 @@ export class BulletSystem {
   }
 
   private createBullet(x: number, y: number, w: number, h: number, vx: number, vy: number, damage: number, weaponType: WeaponType, color: number, piercing = false): Bullet {
-    const sprite = new Graphics();
-    sprite.beginFill(color);
-    sprite.drawRect(0, 0, w, h);
-    sprite.endFill();
-    const bullet: Bullet = {
-      aabb: { x, y, w, h }, vx, vy, damage, weaponType, sprite, alive: true, timer: 3, piercing,
-    };
+    let bullet = this.pool.pop();
+    if (bullet) {
+      bullet.aabb.x = x; bullet.aabb.y = y; bullet.aabb.w = w; bullet.aabb.h = h;
+      bullet.vx = vx; bullet.vy = vy; bullet.damage = damage; bullet.weaponType = weaponType;
+      bullet.alive = true; bullet.timer = 3; bullet.piercing = piercing;
+      bullet.sprite.clear();
+      bullet.sprite.beginFill(color);
+      bullet.sprite.drawRect(0, 0, w, h);
+      bullet.sprite.endFill();
+      bullet.sprite.visible = true;
+      this.container.addChild(bullet.sprite);
+    } else {
+      const sprite = new Graphics();
+      sprite.beginFill(color);
+      sprite.drawRect(0, 0, w, h);
+      sprite.endFill();
+      bullet = { aabb: { x, y, w, h }, vx, vy, damage, weaponType, sprite, alive: true, timer: 3, piercing };
+      this.container.addChild(sprite);
+    }
     this.bullets.push(bullet);
-    this.container.addChild(sprite);
     return bullet;
   }
 
@@ -101,15 +113,25 @@ export class BulletSystem {
       b.sprite.y = Math.round(b.aabb.y);
       b.sprite.visible = b.alive;
     }
-    // Cleanup dead bullets
-    this.bullets = this.bullets.filter(b => {
-      if (!b.alive) { this.container.removeChild(b.sprite); b.sprite.destroy(); }
-      return b.alive;
-    });
+    // Compact dead bullets in-place (swap-remove)
+    let i = 0;
+    while (i < this.bullets.length) {
+      if (!this.bullets[i].alive) {
+        const b = this.bullets[i];
+        this.container.removeChild(b.sprite);
+        this.pool.push(b);
+        this.bullets[i] = this.bullets[this.bullets.length - 1];
+        this.bullets.pop();
+      } else {
+        i++;
+      }
+    }
   }
 
   clear() {
     for (const b of this.bullets) { this.container.removeChild(b.sprite); b.sprite.destroy(); }
+    for (const b of this.pool) { b.sprite.destroy(); }
     this.bullets = [];
+    this.pool = [];
   }
 }

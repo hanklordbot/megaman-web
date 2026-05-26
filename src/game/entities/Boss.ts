@@ -14,6 +14,7 @@ export interface Boss {
   damage: number;
   container: Container;
   alive: boolean;
+  setFloorY(y: number): void;
   update(dt: number, playerX: number, playerY: number): void;
   getBullets(): BossAction[];
 }
@@ -33,10 +34,12 @@ abstract class BaseBoss implements Boss {
   protected vy = 0;
   protected vx = 0;
   protected onGround = true;
+  protected floorY: number;
 
   constructor(x: number, y: number, w: number, h: number, color: number) {
     this.hp = this.maxHp;
     this.aabb = { x, y, w, h };
+    this.floorY = y; // default floor at spawn position
     this.sprite = new Graphics();
     this.sprite.beginFill(color);
     this.sprite.drawRect(0, 0, w, h);
@@ -44,10 +47,12 @@ abstract class BaseBoss implements Boss {
     this.container.addChild(this.sprite);
   }
 
+  setFloorY(y: number) { this.floorY = y; }
+
   protected applyGravity(dt: number) {
     this.vy += 9.8 * TILE_SIZE * dt;
     this.aabb.y += this.vy * dt;
-    if (this.aabb.y > 192) { this.aabb.y = 192; this.vy = 0; this.onGround = true; }
+    if (this.aabb.y > this.floorY) { this.aabb.y = this.floorY; this.vy = 0; this.onGround = true; }
   }
 
   protected syncVisual() {
@@ -98,7 +103,7 @@ export class GutsMan extends BaseBoss {
       this.onGround = false;
       this.state = 1;
       this.timer = 0.8;
-    } else if (this.state === 1 && this.onGround) {
+    } else if (this.state === 1 && this.timer <= 0 && this.onGround) {
       // Earthquake effect (player stun handled externally)
       this.state = 2;
       this.timer = 0.5;
