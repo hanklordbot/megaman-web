@@ -1,35 +1,38 @@
 import { Assets, Spritesheet, Texture } from 'pixi.js';
 
-const SPRITE_MANIFEST = {
-  megaman_mega_buster: 'assets/sprites/megaman/megaman_mega_buster.json',
-  megaman_rolling_cutter: 'assets/sprites/megaman/megaman_rolling_cutter.json',
-  megaman_super_arm: 'assets/sprites/megaman/megaman_super_arm.json',
-  megaman_ice_slasher: 'assets/sprites/megaman/megaman_ice_slasher.json',
-  megaman_hyper_bomb: 'assets/sprites/megaman/megaman_hyper_bomb.json',
-  megaman_fire_storm: 'assets/sprites/megaman/megaman_fire_storm.json',
-  megaman_thunder_beam: 'assets/sprites/megaman/megaman_thunder_beam.json',
-  boss_cut_man: 'assets/sprites/bosses/cut_man.json',
-  boss_guts_man: 'assets/sprites/bosses/guts_man.json',
-  boss_ice_man: 'assets/sprites/bosses/ice_man.json',
-  boss_bomb_man: 'assets/sprites/bosses/bomb_man.json',
-  boss_fire_man: 'assets/sprites/bosses/fire_man.json',
-  boss_elec_man: 'assets/sprites/bosses/elec_man.json',
-  enemy_met: 'assets/sprites/enemies/met.json',
-  enemy_sniper_joe: 'assets/sprites/enemies/sniper_joe.json',
-  enemy_blaster: 'assets/sprites/enemies/blaster.json',
-  enemy_flea: 'assets/sprites/enemies/flea.json',
-  enemy_screw_bomber: 'assets/sprites/enemies/screw_bomber.json',
-  enemy_penguin: 'assets/sprites/enemies/penguin.json',
-  enemy_foot_holder: 'assets/sprites/enemies/foot_holder.json',
-  ui_sprites: 'assets/ui/ui_sprites.json',
-  tileset_cutman: 'assets/tilesets/tileset_cutman.json',
-  tileset_gutsman: 'assets/tilesets/tileset_gutsman.json',
-  tileset_iceman: 'assets/tilesets/tileset_iceman.json',
-  tileset_bombman: 'assets/tilesets/tileset_bombman.json',
-  tileset_fireman: 'assets/tilesets/tileset_fireman.json',
-  tileset_elecman: 'assets/tilesets/tileset_elecman.json',
-  tileset_wily_castle: 'assets/tilesets/tileset_wily_castle.json',
+const SPRITE_MANIFEST: Record<string, string> = {
+  megaman_mega_buster: 'sprites/megaman/megaman_mega_buster.json',
+  megaman_rolling_cutter: 'sprites/megaman/megaman_rolling_cutter.json',
+  megaman_super_arm: 'sprites/megaman/megaman_super_arm.json',
+  megaman_ice_slasher: 'sprites/megaman/megaman_ice_slasher.json',
+  megaman_hyper_bomb: 'sprites/megaman/megaman_hyper_bomb.json',
+  megaman_fire_storm: 'sprites/megaman/megaman_fire_storm.json',
+  megaman_thunder_beam: 'sprites/megaman/megaman_thunder_beam.json',
+  boss_cut_man: 'sprites/bosses/cut_man.json',
+  boss_guts_man: 'sprites/bosses/guts_man.json',
+  boss_ice_man: 'sprites/bosses/ice_man.json',
+  boss_bomb_man: 'sprites/bosses/bomb_man.json',
+  boss_fire_man: 'sprites/bosses/fire_man.json',
+  boss_elec_man: 'sprites/bosses/elec_man.json',
+  enemy_met: 'sprites/enemies/met.json',
+  enemy_sniper_joe: 'sprites/enemies/sniper_joe.json',
+  enemy_blaster: 'sprites/enemies/blaster.json',
+  enemy_flea: 'sprites/enemies/flea.json',
+  enemy_screw_bomber: 'sprites/enemies/screw_bomber.json',
+  enemy_penguin: 'sprites/enemies/penguin.json',
+  enemy_foot_holder: 'sprites/enemies/foot_holder.json',
+  ui_sprites: 'ui/ui_sprites.json',
+  tileset_cutman: 'tilesets/tileset_cutman.json',
+  tileset_gutsman: 'tilesets/tileset_gutsman.json',
+  tileset_iceman: 'tilesets/tileset_iceman.json',
+  tileset_bombman: 'tilesets/tileset_bombman.json',
+  tileset_fireman: 'tilesets/tileset_fireman.json',
+  tileset_elecman: 'tilesets/tileset_elecman.json',
+  tileset_wily_castle: 'tilesets/tileset_wily_castle.json',
 };
+
+const EXTERNAL_BASE = 'assets/external/';
+const FALLBACK_BASE = 'assets/';
 
 export class AssetLoader {
   private static loaded = false;
@@ -38,11 +41,22 @@ export class AssetLoader {
   static async load(): Promise<void> {
     if (this.loaded) return;
     const entries = Object.entries(SPRITE_MANIFEST);
-    const loadPromises = entries.map(async ([key, path]) => {
+    const loadPromises = entries.map(async ([key, relativePath]) => {
+      // Try external first, then fallback
+      const externalPath = EXTERNAL_BASE + relativePath;
+      const fallbackPath = FALLBACK_BASE + relativePath;
       try {
         const sheet = await Promise.race([
-          Assets.load(path),
-          new Promise((_, reject) => setTimeout(() => reject('timeout'), 5000)),
+          Assets.load(externalPath),
+          new Promise((_, reject) => setTimeout(() => reject('timeout'), 3000)),
+        ]) as Spritesheet;
+        this.sheets.set(key, sheet);
+        return;
+      } catch { /* external not found, try fallback */ }
+      try {
+        const sheet = await Promise.race([
+          Assets.load(fallbackPath),
+          new Promise((_, reject) => setTimeout(() => reject('timeout'), 3000)),
         ]) as Spritesheet;
         this.sheets.set(key, sheet);
       } catch {
