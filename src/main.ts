@@ -2,34 +2,56 @@ import { Application, SCALE_MODES, BaseTexture } from 'pixi.js';
 import { GAME_WIDTH, GAME_HEIGHT } from './utils/constants';
 import { Game } from './game/Game';
 
-BaseTexture.defaultOptions.scaleMode = SCALE_MODES.NEAREST;
+function startGame() {
+  BaseTexture.defaultOptions.scaleMode = SCALE_MODES.NEAREST;
 
-const app = new Application({
-  width: GAME_WIDTH,
-  height: GAME_HEIGHT,
-  backgroundColor: 0x000000,
-  resolution: 1,
-  antialias: false,
-});
+  const app = new Application({
+    width: GAME_WIDTH,
+    height: GAME_HEIGHT,
+    backgroundColor: 0x000000,
+    resolution: 1,
+    antialias: false,
+  });
 
-function resize() {
-  const scale = Math.max(1, Math.min(
-    Math.floor(window.innerWidth / GAME_WIDTH),
-    Math.floor(window.innerHeight / GAME_HEIGHT)
-  ));
-  const canvas = app.view as HTMLCanvasElement;
-  canvas.style.width = `${GAME_WIDTH * scale}px`;
-  canvas.style.height = `${GAME_HEIGHT * scale}px`;
-  canvas.style.position = 'absolute';
-  canvas.style.left = `${(window.innerWidth - GAME_WIDTH * scale) / 2}px`;
-  canvas.style.top = `${(window.innerHeight - GAME_HEIGHT * scale) / 2}px`;
+  function resize() {
+    const scale = Math.max(1, Math.min(
+      Math.floor(window.innerWidth / GAME_WIDTH),
+      Math.floor(window.innerHeight / GAME_HEIGHT)
+    ));
+    const canvas = app.view as HTMLCanvasElement;
+    canvas.style.width = `${GAME_WIDTH * scale}px`;
+    canvas.style.height = `${GAME_HEIGHT * scale}px`;
+    canvas.style.position = 'absolute';
+    canvas.style.left = `${(window.innerWidth - GAME_WIDTH * scale) / 2}px`;
+    canvas.style.top = `${(window.innerHeight - GAME_HEIGHT * scale) / 2}px`;
+  }
+
+  document.body.appendChild(app.view as HTMLCanvasElement);
+  window.addEventListener('resize', resize);
+  resize();
+
+  const game = new Game(app);
+  game.start().catch((err) => console.error('Game start failed:', err));
 }
 
-document.body.appendChild(app.view as HTMLCanvasElement);
-window.addEventListener('resize', resize);
-resize();
-
-const game = new Game(app);
-game.start().catch((err) => {
-  console.error('Game start failed:', err);
-});
+// Password gate
+const AUTH_KEY = 'mm_auth';
+if (sessionStorage.getItem(AUTH_KEY) === '1') {
+  document.getElementById('gate')?.remove();
+  startGame();
+} else {
+  const input = document.getElementById('pw') as HTMLInputElement;
+  input?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      if (input.value === 'megaman7') {
+        sessionStorage.setItem(AUTH_KEY, '1');
+        document.getElementById('gate')?.remove();
+        startGame();
+      } else {
+        const err = document.getElementById('err');
+        if (err) err.textContent = 'WRONG PASSWORD';
+        input.value = '';
+      }
+    }
+  });
+}
