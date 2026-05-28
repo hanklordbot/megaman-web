@@ -23,8 +23,11 @@ export class Game {
   }
 
   async start() {
-    await AssetLoader.load();
-    await AudioManager.init();
+    // Load assets but don't block game start on failure
+    try { await AssetLoader.load(); } catch (e) { console.warn('Asset load error:', e); }
+    // Audio init in background — don't block
+    AudioManager.init().catch(e => console.warn('Audio init error:', e));
+
     this.sceneManager.push(new TitleScene(this.sceneManager, this.input, this.gameState));
     this.lastTime = performance.now();
     this.app.ticker.add(() => this.loop());

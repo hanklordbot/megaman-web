@@ -38,14 +38,18 @@ export class AssetLoader {
   static async load(): Promise<void> {
     if (this.loaded) return;
     const entries = Object.entries(SPRITE_MANIFEST);
-    for (const [key, path] of entries) {
+    const loadPromises = entries.map(async ([key, path]) => {
       try {
-        const sheet = await Assets.load(path) as Spritesheet;
+        const sheet = await Promise.race([
+          Assets.load(path),
+          new Promise((_, reject) => setTimeout(() => reject('timeout'), 5000)),
+        ]) as Spritesheet;
         this.sheets.set(key, sheet);
       } catch {
-        console.warn(`Failed to load: ${key} (${path})`);
+        console.warn(`Failed to load: ${key}`);
       }
-    }
+    });
+    await Promise.all(loadPromises);
     this.loaded = true;
   }
 

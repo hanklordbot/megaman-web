@@ -30,4 +30,6 @@ window.addEventListener('resize', resize);
 resize();
 
 const game = new Game(app);
-game.start();
+game.start().catch((err) => {
+  console.error('Game start failed:', err);
+});
