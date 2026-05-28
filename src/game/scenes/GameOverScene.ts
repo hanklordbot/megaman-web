@@ -1,6 +1,7 @@
 import { Container, Text } from 'pixi.js';
 import { Scene, SceneManager } from './SceneManager';
 import { InputSystem } from '../systems/InputSystem';
+import { AudioManager } from '../systems/AudioManager';
 import { GameState } from '../GameState';
 import { GAME_WIDTH, GAME_HEIGHT } from '../../utils/constants';
 import { StageSelectScene } from './StageSelectScene';
@@ -33,6 +34,10 @@ export class GameOverScene implements Scene {
 
     this.options = [cont, stageSelect];
     this.container.addChild(cont, stageSelect);
+  }
+
+  enter() {
+    AudioManager.playBGM('gameover', false);
   }
 
   update(_dt: number) {

@@ -1,5 +1,6 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, AnimatedSprite } from 'pixi.js';
 import { AABB } from '../systems/PhysicsSystem';
+import { AssetLoader } from '../systems/AssetLoader';
 import { TILE_SIZE } from '../../utils/constants';
 
 export interface Enemy {
@@ -29,12 +30,13 @@ export class Met implements Enemy {
 
   constructor(x: number, y: number) {
     this.aabb = { x, y, w: 16, h: 16 };
-    this.sprite = new Graphics();
-    this.draw();
+    const { sprite } = makeEnemySprite('enemy_met', 'idle', 16, 16, 0x888800);
+    this.sprite = sprite as Graphics;
     this.container.addChild(this.sprite);
   }
 
   private draw() {
+    if (!(this.sprite instanceof Graphics)) return;
     this.sprite.clear();
     this.sprite.beginFill(this.hiding ? 0x888800 : 0xcccc00);
     this.sprite.drawRect(0, 0, 16, 16);
@@ -296,6 +298,21 @@ export class FootHolder implements Enemy {
     this.container.x = Math.round(this.aabb.x);
     this.container.y = Math.round(this.aabb.y);
   }
+}
+
+function makeEnemySprite(sheetKey: string, animName: string, w: number, h: number, fallbackColor: number): { sprite: Container; anim: AnimatedSprite | null } {
+  const textures = AssetLoader.getAnimationTextures(sheetKey, animName);
+  if (textures.length > 0) {
+    const anim = new AnimatedSprite(textures);
+    anim.animationSpeed = 0.1;
+    anim.play();
+    return { sprite: anim, anim };
+  }
+  const g = new Graphics();
+  g.beginFill(fallbackColor);
+  g.drawRect(0, 0, w, h);
+  g.endFill();
+  return { sprite: g, anim: null };
 }
 
 export function createEnemy(type: string, x: number, y: number): Enemy {

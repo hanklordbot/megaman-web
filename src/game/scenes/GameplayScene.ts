@@ -3,6 +3,8 @@ import { Scene, SceneManager } from './SceneManager';
 import { InputSystem } from '../systems/InputSystem';
 import { PhysicsSystem } from '../systems/PhysicsSystem';
 import { Camera } from '../systems/Camera';
+import { AssetLoader } from '../systems/AssetLoader';
+import { AudioManager } from '../systems/AudioManager';
 import { Player } from '../entities/Player';
 import { BulletSystem } from '../entities/BulletSystem';
 import { Enemy, createEnemy } from '../entities/Enemy';
@@ -70,6 +72,10 @@ export class GameplayScene implements Scene {
     this.camera.container.addChild(this.enemyBulletContainer);
     this.container.addChild(this.camera.container);
     this.container.addChild(this.hud.container);
+  }
+
+  enter() {
+    AudioManager.playBGM(this.stageId);
   }
 
   private buildTiles() {
@@ -175,6 +181,8 @@ export class GameplayScene implements Scene {
     this.boss.setFloorY(this.level.bossY!);
     this.camera.container.addChild(this.boss.container);
     this.hud.showBossHp(true);
+    AudioManager.playBGM('boss');
+    AudioManager.playSE('boss_door');
   }
 
   private spawnEnemyBullet(b: { x: number; y: number; vx: number; vy: number; damage: number }) {
@@ -202,6 +210,7 @@ export class GameplayScene implements Scene {
             e.container.visible = false;
             this.gameState.score += 100;
             this.items.tryDrop(e.aabb.x, e.aabb.y);
+            AudioManager.playSE('enemy_destroy');
           }
         }
       }
@@ -223,6 +232,7 @@ export class GameplayScene implements Scene {
           this.gameState.defeatedBosses.add(this.stageId);
           this.awardWeapon();
           this.bossDefeatedTimer = 2;
+          AudioManager.playSE('boss_explode');
         }
       }
     }
@@ -265,10 +275,11 @@ export class GameplayScene implements Scene {
       if (PhysicsSystem.aabbOverlap(pAABB, item.aabb)) {
         item.alive = false;
         const effect = ItemSystem.getEffect(item.type);
-        if (effect.hp) this.gameState.hp = Math.min(this.gameState.hp + effect.hp, this.gameState.maxHp);
+        if (effect.hp) { this.gameState.hp = Math.min(this.gameState.hp + effect.hp, this.gameState.maxHp); AudioManager.playSE('hp_recover'); }
         if (effect.ammo) this.gameState.restoreAmmo(effect.ammo);
-        if (effect.lives) this.gameState.lives += effect.lives;
+        if (effect.lives) { this.gameState.lives += effect.lives; AudioManager.playSE('oneup'); }
         if (effect.score) this.gameState.score += effect.score;
+        if (!effect.hp && !effect.lives) AudioManager.playSE('item_pickup');
       }
     }
   }

@@ -2,6 +2,8 @@ import { Application } from 'pixi.js';
 import { FIXED_DT } from '../utils/constants';
 import { SceneManager } from './scenes/SceneManager';
 import { InputSystem } from './systems/InputSystem';
+import { AssetLoader } from './systems/AssetLoader';
+import { AudioManager } from './systems/AudioManager';
 import { TitleScene } from './scenes/TitleScene';
 import { GameState } from './GameState';
 
@@ -20,7 +22,9 @@ export class Game {
     this.sceneManager = new SceneManager(app.stage, this.input);
   }
 
-  start() {
+  async start() {
+    await AssetLoader.load();
+    await AudioManager.init();
     this.sceneManager.push(new TitleScene(this.sceneManager, this.input, this.gameState));
     this.lastTime = performance.now();
     this.app.ticker.add(() => this.loop());

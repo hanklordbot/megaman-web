@@ -1,0 +1,199 @@
+{
+  "frames": {
+    "sniper_joe_shield_0.png": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 32
+      },
+      "duration": 100
+    },
+    "sniper_joe_shield_1.png": {
+      "frame": {
+        "x": 24,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 32
+      },
+      "duration": 100
+    },
+    "sniper_joe_shoot_0.png": {
+      "frame": {
+        "x": 48,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 32
+      },
+      "duration": 100
+    },
+    "sniper_joe_shoot_1.png": {
+      "frame": {
+        "x": 72,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 32
+      },
+      "duration": 100
+    },
+    "sniper_joe_walk_0.png": {
+      "frame": {
+        "x": 96,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 32
+      },
+      "duration": 100
+    },
+    "sniper_joe_walk_1.png": {
+      "frame": {
+        "x": 120,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 32
+      },
+      "duration": 100
+    },
+    "sniper_joe_walk_2.png": {
+      "frame": {
+        "x": 144,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 32
+      },
+      "duration": 100
+    },
+    "sniper_joe_walk_3.png": {
+      "frame": {
+        "x": 168,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 32
+      },
+      "duration": 100
+    }
+  },
+  "animations": {
+    "shield": [
+      "sniper_joe_shield_0.png",
+      "sniper_joe_shield_1.png"
+    ],
+    "shoot": [
+      "sniper_joe_shoot_0.png",
+      "sniper_joe_shoot_1.png"
+    ],
+    "walk": [
+      "sniper_joe_walk_0.png",
+      "sniper_joe_walk_1.png",
+      "sniper_joe_walk_2.png",
+      "sniper_joe_walk_3.png"
+    ]
+  },
+  "meta": {
+    "app": "custom-generator",
+    "version": "1.0",
+    "image": "sniper_joe.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 192,
+      "h": 32
+    },
+    "scale": "1"
+  }
+}

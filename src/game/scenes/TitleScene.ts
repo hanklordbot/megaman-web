@@ -1,6 +1,7 @@
 import { Container, Text } from 'pixi.js';
 import { Scene, SceneManager } from './SceneManager';
 import { InputSystem } from '../systems/InputSystem';
+import { AudioManager } from '../systems/AudioManager';
 import { GameState } from '../GameState';
 import { GAME_WIDTH, GAME_HEIGHT } from '../../utils/constants';
 import { StageSelectScene } from './StageSelectScene';
@@ -37,6 +38,10 @@ export class TitleScene implements Scene {
     this.promptText.position.set(GAME_WIDTH / 2, GAME_HEIGHT * 0.65);
 
     this.container.addChild(title, this.promptText);
+  }
+
+  enter() {
+    AudioManager.playBGM('title');
   }
 
   update(dt: number) {

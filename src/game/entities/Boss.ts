@@ -1,5 +1,7 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, AnimatedSprite } from 'pixi.js';
 import { AABB } from '../systems/PhysicsSystem';
+import { AssetLoader } from '../systems/AssetLoader';
+import { AudioManager } from '../systems/AudioManager';
 import { TILE_SIZE } from '../../utils/constants';
 
 export interface BossAction {
@@ -36,7 +38,7 @@ abstract class BaseBoss implements Boss {
   protected onGround = true;
   protected floorY: number;
 
-  constructor(x: number, y: number, w: number, h: number, color: number) {
+  constructor(x: number, y: number, w: number, h: number, color: number, sheetKey?: string) {
     this.hp = this.maxHp;
     this.aabb = { x, y, w, h };
     this.floorY = y; // default floor at spawn position
@@ -45,6 +47,16 @@ abstract class BaseBoss implements Boss {
     this.sprite.drawRect(0, 0, w, h);
     this.sprite.endFill();
     this.container.addChild(this.sprite);
+    if (sheetKey) {
+      const textures = AssetLoader.getAnimationTextures(sheetKey, 'idle');
+      if (textures.length > 0) {
+        const anim = new AnimatedSprite(textures);
+        anim.animationSpeed = 0.1;
+        anim.play();
+        this.sprite.visible = false;
+        this.container.addChild(anim);
+      }
+    }
   }
 
   setFloorY(y: number) { this.floorY = y; }
@@ -68,7 +80,7 @@ abstract class BaseBoss implements Boss {
 // Cut Man: jump → throw cutter (boomerang) → wait
 export class CutMan extends BaseBoss {
   id = 'cutman';
-  constructor(x: number, y: number) { super(x, y, 32, 32, 0x888888); }
+  constructor(x: number, y: number) { super(x, y, 32, 32, 0x888888, 'boss_cut_man'); }
 
   update(dt: number, playerX: number) {
     this.timer -= dt;
@@ -94,7 +106,7 @@ export class CutMan extends BaseBoss {
 // Guts Man: jump (shake) → throw rock
 export class GutsMan extends BaseBoss {
   id = 'gutsman';
-  constructor(x: number, y: number) { super(x, y, 40, 40, 0xcc4400); }
+  constructor(x: number, y: number) { super(x, y, 40, 40, 0xcc4400, 'boss_guts_man'); }
 
   update(dt: number, playerX: number) {
     this.timer -= dt;
@@ -123,7 +135,7 @@ export class IceMan extends BaseBoss {
   id = 'iceman';
   private shots = 0;
   private moveDir = -1;
-  constructor(x: number, y: number) { super(x, y, 32, 32, 0x2244aa); }
+  constructor(x: number, y: number) { super(x, y, 32, 32, 0x2244aa, 'boss_ice_man'); }
 
   update(dt: number, playerX: number) {
     this.timer -= dt;
@@ -148,7 +160,7 @@ export class IceMan extends BaseBoss {
 // Bomb Man: jump → throw bomb → jump evade
 export class BombMan extends BaseBoss {
   id = 'bombman';
-  constructor(x: number, y: number) { super(x, y, 32, 32, 0x44aa44); }
+  constructor(x: number, y: number) { super(x, y, 32, 32, 0x44aa44, 'boss_bomb_man'); }
 
   update(dt: number, playerX: number) {
     this.timer -= dt;
@@ -185,7 +197,7 @@ export class BombMan extends BaseBoss {
 export class FireMan extends BaseBoss {
   id = 'fireman';
   private moveDir = 1;
-  constructor(x: number, y: number) { super(x, y, 32, 40, 0xff4400); }
+  constructor(x: number, y: number) { super(x, y, 32, 40, 0xff4400, 'boss_fire_man'); }
 
   update(dt: number, playerX: number) {
     this.timer -= dt;
@@ -217,7 +229,7 @@ export class FireMan extends BaseBoss {
 // Elec Man: jump → Thunder Beam (3-way) → dash
 export class ElecMan extends BaseBoss {
   id = 'elecman';
-  constructor(x: number, y: number) { super(x, y, 32, 40, 0x222222); }
+  constructor(x: number, y: number) { super(x, y, 32, 40, 0x222222, 'boss_elec_man'); }
 
   update(dt: number, playerX: number) {
     this.timer -= dt;

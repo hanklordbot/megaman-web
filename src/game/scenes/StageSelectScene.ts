@@ -1,6 +1,7 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { Scene, SceneManager } from './SceneManager';
 import { InputSystem } from '../systems/InputSystem';
+import { AudioManager } from '../systems/AudioManager';
 import { GameState } from '../GameState';
 import { GAME_WIDTH, GAME_HEIGHT } from '../../utils/constants';
 import { GameplayScene } from './GameplayScene';
@@ -93,6 +94,10 @@ export class StageSelectScene implements Scene {
     this.cursorSprite.position.set(slot.x, slot.y);
   }
 
+  enter() {
+    AudioManager.playBGM('stage_select');
+  }
+
   update(_dt: number) {
     let moved = false;
     if (this.input.justPressed('ArrowRight') || this.input.justPressed('KeyD')) {
@@ -107,7 +112,7 @@ export class StageSelectScene implements Scene {
     if (this.input.justPressed('ArrowUp') || this.input.justPressed('KeyW')) {
       if (this.cursor >= 3) { this.cursor -= 3; moved = true; }
     }
-    if (moved) this.updateCursor();
+    if (moved) { this.updateCursor(); AudioManager.playSE('cursor'); }
 
     if (this.input.justPressed('Enter') || this.input.justPressed('KeyZ')) {
       const boss = BOSSES[this.cursor];

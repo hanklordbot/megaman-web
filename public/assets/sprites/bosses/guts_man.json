@@ -1,0 +1,335 @@
+{
+  "frames": {
+    "guts_man_idle_0.png": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "duration": 120
+    },
+    "guts_man_idle_1.png": {
+      "frame": {
+        "x": 40,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "duration": 120
+    },
+    "guts_man_walk_0.png": {
+      "frame": {
+        "x": 80,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "duration": 120
+    },
+    "guts_man_walk_1.png": {
+      "frame": {
+        "x": 120,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "duration": 120
+    },
+    "guts_man_walk_2.png": {
+      "frame": {
+        "x": 160,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "duration": 120
+    },
+    "guts_man_walk_3.png": {
+      "frame": {
+        "x": 200,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "duration": 120
+    },
+    "guts_man_jump_0.png": {
+      "frame": {
+        "x": 240,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "duration": 120
+    },
+    "guts_man_jump_1.png": {
+      "frame": {
+        "x": 280,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "duration": 120
+    },
+    "guts_man_attack_0.png": {
+      "frame": {
+        "x": 0,
+        "y": 40,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "duration": 120
+    },
+    "guts_man_attack_1.png": {
+      "frame": {
+        "x": 40,
+        "y": 40,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "duration": 120
+    },
+    "guts_man_attack_2.png": {
+      "frame": {
+        "x": 80,
+        "y": 40,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "duration": 120
+    },
+    "guts_man_attack_3.png": {
+      "frame": {
+        "x": 120,
+        "y": 40,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "duration": 120
+    },
+    "guts_man_hurt_0.png": {
+      "frame": {
+        "x": 160,
+        "y": 40,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "duration": 120
+    },
+    "guts_man_hurt_1.png": {
+      "frame": {
+        "x": 200,
+        "y": 40,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "duration": 120
+    }
+  },
+  "animations": {
+    "idle": [
+      "guts_man_idle_0.png",
+      "guts_man_idle_1.png"
+    ],
+    "walk": [
+      "guts_man_walk_0.png",
+      "guts_man_walk_1.png",
+      "guts_man_walk_2.png",
+      "guts_man_walk_3.png"
+    ],
+    "jump": [
+      "guts_man_jump_0.png",
+      "guts_man_jump_1.png"
+    ],
+    "attack": [
+      "guts_man_attack_0.png",
+      "guts_man_attack_1.png",
+      "guts_man_attack_2.png",
+      "guts_man_attack_3.png"
+    ],
+    "hurt": [
+      "guts_man_hurt_0.png",
+      "guts_man_hurt_1.png"
+    ]
+  },
+  "meta": {
+    "app": "custom-generator",
+    "version": "1.0",
+    "image": "guts_man.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 320,
+      "h": 80
+    },
+    "scale": "1"
+  }
+}
