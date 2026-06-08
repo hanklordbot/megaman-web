@@ -1,4 +1,4 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, Sprite, Texture } from 'pixi.js';
 import { Scene, SceneManager } from './SceneManager';
 import { InputSystem } from '../systems/InputSystem';
 import { PhysicsSystem } from '../systems/PhysicsSystem';
@@ -79,17 +79,39 @@ export class GameplayScene implements Scene {
   }
 
   private buildTiles() {
-    const g = new Graphics();
-    for (let row = 0; row < this.level.height; row++) {
-      for (let col = 0; col < this.level.width; col++) {
-        if (this.level.tiles[row]?.[col] === 1) {
-          g.beginFill(0x444466);
-          g.drawRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-          g.endFill();
+    const sheetKey = 'tileset_' + this.stageId.replace('man', '');
+    const groundTex = AssetLoader.getTexture(sheetKey, sheetKey + '_ground');
+    const wallTex = AssetLoader.getTexture(sheetKey, sheetKey + '_wall');
+
+    if (groundTex || wallTex) {
+      for (let row = 0; row < this.level.height; row++) {
+        for (let col = 0; col < this.level.width; col++) {
+          if (this.level.tiles[row]?.[col] !== 1) continue;
+          // Use wall texture if tile above is empty, otherwise ground
+          const above = row > 0 ? (this.level.tiles[row - 1]?.[col] ?? 0) : 0;
+          const tex = above === 0 ? (wallTex ?? groundTex!) : (groundTex ?? wallTex!);
+          const spr = new Sprite(tex);
+          spr.x = col * TILE_SIZE;
+          spr.y = row * TILE_SIZE;
+          spr.width = TILE_SIZE;
+          spr.height = TILE_SIZE;
+          this.tileContainer.addChild(spr);
         }
       }
+    } else {
+      // Fallback: solid color
+      const g = new Graphics();
+      for (let row = 0; row < this.level.height; row++) {
+        for (let col = 0; col < this.level.width; col++) {
+          if (this.level.tiles[row]?.[col] === 1) {
+            g.beginFill(0x444466);
+            g.drawRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            g.endFill();
+          }
+        }
+      }
+      this.tileContainer.addChild(g);
     }
-    this.tileContainer.addChild(g);
   }
 
   private tileSolid = (col: number, row: number): boolean => {

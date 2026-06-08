@@ -1,5 +1,6 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, Sprite } from 'pixi.js';
 import { AABB } from '../systems/PhysicsSystem';
+import { AssetLoader } from '../systems/AssetLoader';
 
 export enum ItemType {
   SmallHP = 'smallHp',
@@ -28,10 +29,19 @@ const COLORS: Record<ItemType, number> = {
   [ItemType.Score]: 0xffff00,
 };
 
+const ITEM_TEX_MAP: Record<ItemType, string> = {
+  [ItemType.SmallHP]: 'hp_small',
+  [ItemType.LargeHP]: 'hp_large',
+  [ItemType.SmallWeapon]: 'weapon_small',
+  [ItemType.LargeWeapon]: 'weapon_large',
+  [ItemType.OneUp]: 'extra_life',
+  [ItemType.Score]: 'e_tank',
+};
+
 export interface Item {
   aabb: AABB;
   type: ItemType;
-  sprite: Graphics;
+  sprite: Container;
   alive: boolean;
   vy: number;
 }
@@ -49,15 +59,25 @@ export class ItemSystem {
         return this.spawn(x, y, entry.type);
       }
     }
-    return null; // 43% chance no drop
+    return null;
   }
 
   spawn(x: number, y: number, type: ItemType): Item {
     const size = type === ItemType.LargeHP || type === ItemType.LargeWeapon ? 12 : 8;
-    const sprite = new Graphics();
-    sprite.beginFill(COLORS[type]);
-    sprite.drawRect(0, 0, size, size);
-    sprite.endFill();
+    let sprite: Container;
+    const tex = AssetLoader.getItemTexture(ITEM_TEX_MAP[type]);
+    if (tex) {
+      const s = new Sprite(tex);
+      s.width = size;
+      s.height = size;
+      sprite = s;
+    } else {
+      const g = new Graphics();
+      g.beginFill(COLORS[type]);
+      g.drawRect(0, 0, size, size);
+      g.endFill();
+      sprite = g;
+    }
     const item: Item = { aabb: { x, y, w: size, h: size }, type, sprite, alive: true, vy: -50 };
     this.items.push(item);
     this.container.addChild(sprite);
@@ -74,7 +94,6 @@ export class ItemSystem {
       item.sprite.y = Math.round(item.aabb.y);
       item.sprite.visible = item.alive;
     }
-    // Swap-remove dead items
     let i = 0;
     while (i < this.items.length) {
       if (!this.items[i].alive) {

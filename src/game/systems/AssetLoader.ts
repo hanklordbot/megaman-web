@@ -1,4 +1,4 @@
-import { Assets, Spritesheet, Texture } from 'pixi.js';
+import { Assets, Spritesheet, Texture, BaseTexture, Rectangle } from 'pixi.js';
 
 const SPRITE_MANIFEST: Record<string, string> = {
   megaman_mega_buster: 'sprites/megaman/megaman_mega_buster.json',
@@ -31,40 +31,84 @@ const SPRITE_MANIFEST: Record<string, string> = {
   tileset_wily_castle: 'tilesets/tileset_wily_castle.json',
 };
 
-const EXTERNAL_BASE = 'assets/external/';
 const FALLBACK_BASE = 'assets/';
+
+export interface ItemFrame { name: string; x: number; y: number; w: number; h: number }
+export interface HudElements { [key: string]: { x: number; y: number; w: number; h: number } }
+export interface StageSelectPortrait { boss: string; x: number; y: number; w: number; h: number }
 
 export class AssetLoader {
   private static loaded = false;
   private static sheets: Map<string, Spritesheet> = new Map();
+  private static itemFrames: ItemFrame[] = [];
+  private static itemBaseTexture: BaseTexture | null = null;
+  private static hudElements: HudElements = {};
+  private static hudBaseTexture: BaseTexture | null = null;
+  private static stageSelectPortraits: StageSelectPortrait[] = [];
+  private static stageSelectBaseTexture: BaseTexture | null = null;
+  private static titleTexture: Texture | null = null;
 
   static async load(): Promise<void> {
     if (this.loaded) return;
+
+    // Load standard spritesheets
     const entries = Object.entries(SPRITE_MANIFEST);
-    const loadPromises = entries.map(async ([key, relativePath]) => {
-      // Try external first, then fallback
-      const externalPath = EXTERNAL_BASE + relativePath;
-      const fallbackPath = FALLBACK_BASE + relativePath;
+    await Promise.all(entries.map(async ([key, relativePath]) => {
+      const path = FALLBACK_BASE + relativePath;
       try {
         const sheet = await Promise.race([
-          Assets.load(externalPath),
-          new Promise((_, reject) => setTimeout(() => reject('timeout'), 3000)),
-        ]) as Spritesheet;
-        this.sheets.set(key, sheet);
-        return;
-      } catch { /* external not found, try fallback */ }
-      try {
-        const sheet = await Promise.race([
-          Assets.load(fallbackPath),
-          new Promise((_, reject) => setTimeout(() => reject('timeout'), 3000)),
+          Assets.load(path),
+          new Promise((_, reject) => setTimeout(() => reject('timeout'), 5000)),
         ]) as Spritesheet;
         this.sheets.set(key, sheet);
       } catch {
         console.warn(`Failed to load: ${key}`);
       }
-    });
-    await Promise.all(loadPromises);
+    }));
+
+    // Load custom items spritesheet
+    await this.loadItems();
+    // Load HUD elements
+    await this.loadHud();
+    // Load stage select portraits
+    await this.loadStageSelect();
+    // Load title screen
+    await this.loadTitle();
+
     this.loaded = true;
+  }
+
+  private static async loadItems(): Promise<void> {
+    try {
+      const res = await fetch(FALLBACK_BASE + 'items/items_spritesheet.json');
+      const data = await res.json();
+      this.itemFrames = data.items ?? [];
+      this.itemBaseTexture = BaseTexture.from(FALLBACK_BASE + 'items/items_spritesheet.png');
+    } catch { console.warn('Failed to load items spritesheet'); }
+  }
+
+  private static async loadHud(): Promise<void> {
+    try {
+      const res = await fetch(FALLBACK_BASE + 'ui/hud_elements.json');
+      const data = await res.json();
+      this.hudElements = data.elements ?? {};
+      this.hudBaseTexture = BaseTexture.from(FALLBACK_BASE + 'ui/hud_elements.png');
+    } catch { console.warn('Failed to load hud_elements'); }
+  }
+
+  private static async loadStageSelect(): Promise<void> {
+    try {
+      const res = await fetch(FALLBACK_BASE + 'ui/stage_select.json');
+      const data = await res.json();
+      this.stageSelectPortraits = data.portraits ?? [];
+      this.stageSelectBaseTexture = BaseTexture.from(FALLBACK_BASE + 'ui/stage_select.png');
+    } catch { console.warn('Failed to load stage_select'); }
+  }
+
+  private static async loadTitle(): Promise<void> {
+    try {
+      this.titleTexture = await Assets.load(FALLBACK_BASE + 'ui/title_screen.png') as Texture;
+    } catch { console.warn('Failed to load title_screen'); }
   }
 
   static getSheet(key: string): Spritesheet | undefined {
@@ -79,6 +123,31 @@ export class AssetLoader {
   static getAnimationTextures(sheetKey: string, animName: string): Texture[] {
     const sheet = this.sheets.get(sheetKey);
     return sheet?.animations?.[animName] ?? [];
+  }
+
+  static getItemTexture(name: string): Texture | null {
+    if (!this.itemBaseTexture) return null;
+    const frame = this.itemFrames.find(f => f.name === name);
+    if (!frame) return null;
+    return new Texture(this.itemBaseTexture, new Rectangle(frame.x, frame.y, frame.w, frame.h));
+  }
+
+  static getHudTexture(name: string): Texture | null {
+    if (!this.hudBaseTexture) return null;
+    const el = this.hudElements[name];
+    if (!el) return null;
+    return new Texture(this.hudBaseTexture, new Rectangle(el.x, el.y, el.w, el.h));
+  }
+
+  static getStageSelectPortrait(bossShort: string): Texture | null {
+    if (!this.stageSelectBaseTexture) return null;
+    const p = this.stageSelectPortraits.find(pp => pp.boss === bossShort);
+    if (!p) return null;
+    return new Texture(this.stageSelectBaseTexture, new Rectangle(p.x, p.y, p.w, p.h));
+  }
+
+  static getTitleTexture(): Texture | null {
+    return this.titleTexture;
   }
 
   static isLoaded(): boolean {
